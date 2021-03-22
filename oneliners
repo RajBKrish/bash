@@ -1,0 +1,16 @@
+# DNS names of all servers that connect here:
+for i in $(netstat -an | grep "ESTABLISHED\|TIME_WAIT" | awk {'print $5'} | cut -d":" -f1 | sort | uniq); do nslookup $i | grep name | grep -v nameserver | awk {'print $4'}; done
+# query all packages in CentOS to see which ones were installed whenever:
+rpm -qa –qf '%{INSTALLTIME} %-40{NAME} %{INSTALLTIME:date}\n' | sort -n | cut -d' ‘ -f2-
+# I want to restart similar apps from my system with one shot:
+for i in $(ll | grep service_name | awk {'print $9'}); do service $i status; done 
+# To find errors inside -web servers that are using the highest CPU
+for location in $(for i in $(ps -eo pid,ppid,cmd,%mem,%cpu –sort=-%mem | head | awk 'NR==2{print $1}'); do ll /proc/$i | grep cwd | awk '{print $11}' ; done); do grep -A17 -B2 "ERROR" $location/logs/* ; done
+# Grab for Java process PIDs
+ps auxf | head -1; ps auxf | grep java | awk {'print $2'}
+# shows where the web server is making connections
+netstat -an | grep -v 127.0.0.1 | grep -v unix | awk {'print $5'} | sort | uniq | cut -d ":" -f1 | sort | uniq
+# find the PID for the highest process in memory consumption
+ps -eo pid,ppid,cmd,%mem,%cpu –sort=-%mem | head | awk 'NR==2{print $1}'
+# find highest process with highest memory
+for i in $(ps -eo pid,ppid,cmd,%mem,%cpu –sort=-%mem | head | awk 'NR==2{print $1}'); do ll /proc/$i | grep cwd | awk '{print $11}' ; done
